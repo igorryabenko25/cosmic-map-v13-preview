@@ -357,6 +357,14 @@ button{background:#10283eee;color:#f6ddb0;border:1px solid #d1aa72;border-radius
 @media(prefers-reduced-motion:reduce){
  #practiceScene .scene-motion-arc,#practiceScene .scene-motion-dots{animation:none!important}
 }
+
+/* Mobile card usability: keep close control reachable and real-room action visible. */
+#room #close{position:sticky;top:8px;right:auto;display:block;width:max-content;max-width:100%;margin:0 0 -46px auto;z-index:30;background:#122b40f2;box-shadow:0 4px 16px #0008;min-height:44px}
+#room{scroll-padding-top:72px}
+#room.practice-mode #practice>button:last-of-type{max-width:100%}
+#room.practice-mode #practice #motionToggle{max-width:100%}
+#room.practice-mode #practiceText + button{position:sticky;bottom:10px;z-index:20;width:min(100%,520px);max-width:100%;box-shadow:0 5px 22px #000a;font:clamp(14px,4vw,19px)/1.25 Georgia,serif;min-height:54px}
+@media(max-width:580px){#overlay{padding:12px 8px max(12px,env(safe-area-inset-bottom))}#room{max-height:calc(100dvh - 32px);padding:12px 14px 24px}#room #close{top:8px;margin-bottom:-48px;font-size:17px;padding:10px 14px}#room.practice-mode #practiceText + button{bottom:8px;margin:10px auto 12px}}
 </style>
 </head><body>
 <div id="sky"><div class="nebula nebula-a"></div><div class="nebula nebula-b"></div><div class="galaxy"></div><div class="planet"></div><div class="moon"></div><div class="starfield starfield-near"></div><div class="starfield starfield-far"></div><div id="mist"></div><div id="shootingStars" aria-hidden="true"></div></div>
@@ -562,7 +570,7 @@ const cosmicRouteButton = document.createElement('button');
 cosmicRouteButton.type='button';
 cosmicRouteButton.textContent='Открыть действующее пространство →';
 cosmicRouteButton.style.cssText='display:none;margin:12px auto;padding:12px 18px;min-height:46px;background:#a58352;color:#fff9ec;border:1px solid #e6c68e;border-radius:12px;cursor:pointer';
-document.getElementById('practice').append(cosmicRouteButton);
+document.getElementById('practiceText').insertAdjacentElement('afterend',cosmicRouteButton);
 function syncCosmicRoute(item){
  const direct=COSMIC_ROUTES[item];
  // Never route placeholders, games, or training. Live room exercises route to their real room, not an invented exercise URL.
