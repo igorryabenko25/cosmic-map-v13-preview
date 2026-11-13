@@ -577,7 +577,7 @@ function syncCosmicRoute(item){
  const parentRoom=depthStack.length?depthStack[depthStack.length-1].title:null;
  const route=direct || (parentRoom && verifiedLivePractices[parentRoom]?.includes(item) ? COSMIC_ROUTES[parentRoom] : null);
  cosmicRouteButton.style.display=route?'block':'none';
- cosmicRouteButton.onclick=route?()=>window.parent.postMessage({type:'cosmic-map:navigate',path:route},location.origin):null;
+ cosmicRouteButton.onclick=route?()=>{const destination=new URL(route,'https://biblioteka-sostoyaniy.ru');if(window.parent!==window && window.location.origin===window.parent.location.origin){window.parent.postMessage({type:'cosmic-map:navigate',path:route},window.location.origin)}else{window.location.assign(destination.href)}}:null;
 }
 const originalCosmicOpenPractice=openPractice;
 openPractice=function(item){originalCosmicOpenPractice(item);syncCosmicRoute(item)};
