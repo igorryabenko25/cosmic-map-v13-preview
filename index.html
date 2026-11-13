@@ -1,0 +1,533 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5"><title>Библиотека состояний · Волшебная карта V4</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030817;color:#ffe9bd;font-family:Georgia,serif}button,input{font:inherit}button{cursor:pointer}
+#sky{position:fixed;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#3c5473 0%,#152c4a 30%,#071326 64%,#020710 100%)}
+#sky:before{content:"";position:absolute;inset:-20%;background:radial-gradient(ellipse at 52% 32%,#fff1c4a6 0%,#f0ba6788 2%,#d7a15c33 9%,transparent 29%),radial-gradient(ellipse at 17% 55%,#45879b52,transparent 39%),radial-gradient(ellipse at 83% 64%,#775e9b52,transparent 41%);filter:blur(18px)}
+#sky:after{content:"";position:absolute;inset:0;opacity:.75;background-image:radial-gradient(#ffedc4 1px,transparent 2px),radial-gradient(#d4e6ff 1px,transparent 2px),radial-gradient(#ffe9b7 1.3px,transparent 2px);background-size:73px 91px,127px 111px,197px 167px;background-position:7px 22px,59px 74px,90px 38px}
+.moon{position:absolute;left:calc(50% - 68px);top:7%;width:136px;height:136px;border-radius:50%;background:radial-gradient(circle at 38% 35%,#fff9e4,#f6dc9d 55%,#c68d51);box-shadow:0 0 40px #ffedbba9,0 0 150px #edbd6e7a}
+.mountain{position:absolute;bottom:-4%;width:130%;left:-15%;height:48%;clip-path:polygon(0 78%,9% 55%,17% 71%,28% 28%,37% 58%,48% 19%,56% 52%,67% 35%,79% 63%,89% 24%,100% 72%,100% 100%,0 100%);background:linear-gradient(180deg,#284c66b0,#071427)}
+.mountain.back{bottom:6%;opacity:.4;transform:scaleX(-1);filter:blur(7px)}
+#mist{position:absolute;bottom:-20%;left:-20%;width:140%;height:58%;border-radius:50%;background:radial-gradient(ellipse,#5c9caa47,transparent 70%);filter:blur(35px)}
+#viewport{position:absolute;inset:0;touch-action:none;overflow:hidden;cursor:grab}
+#world{position:absolute;left:0;top:0;width:1400px;height:1020px;transform-origin:0 0;will-change:transform}
+#floor{position:absolute;inset:90px 90px 80px;border-radius:48%;background:radial-gradient(ellipse at 50% 42%,#4b5b63aa 0%,#1e435a88 43%,#12253cdd 73%,#061324 100%);border:8px double #e3bc7e6e;box-shadow:0 0 0 28px #dfb97e1b,0 0 0 54px #f1d8a10d,inset 0 0 95px #f1c2763b,0 0 110px #ddae6b54}
+#roads{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 11px #f8cc83)}
+#roads path{stroke:#cfad72;stroke-width:28;fill:none;stroke-linecap:round}#roads path.lane{stroke:#ffe7b4;stroke-width:2;stroke-dasharray:4 18}
+.hall{position:absolute;transform:translate(-50%,-50%);width:260px;height:220px;border-radius:48% 48% 16% 16%;border:3px ridge var(--rim);background:radial-gradient(ellipse at 50% 6%,var(--light),transparent 48%),linear-gradient(155deg,var(--wall),#09192b 80%);box-shadow:0 11px 0 -3px var(--rim),0 24px 0 -5px #6b4b31,0 35px 0 -8px #152338,0 53px 24px #000b,0 0 52px var(--glow),inset 12px 0 20px #ffffff25,inset -20px -22px 24px #000a;display:flex;align-items:center;justify-content:end;flex-direction:column;gap:6px;padding:35px 10px 20px;text-align:center;color:#fff0d2;user-select:none}
+.hall:before{content:"";position:absolute;left:38px;right:38px;top:-74px;height:133px;border:4px ridge var(--rim);border-radius:50% 50% 18% 18%;background:radial-gradient(ellipse at 45% 15%,#fff3c7aa,transparent 48%),repeating-linear-gradient(90deg,var(--wall) 0 27px,#a5a3a450 28px 32px,var(--wall) 34px 59px);box-shadow:inset 0 15px 20px #fff4c36b,inset -14px -18px 24px #0008,0 0 35px var(--glow)}
+.hall:after{content:"";position:absolute;bottom:5px;left:16%;right:16%;height:36px;border-top:3px solid var(--rim);background:repeating-linear-gradient(90deg,transparent 0 22px,var(--rim) 23px 27px,transparent 28px 45px);opacity:.45;pointer-events:none}
+.hall .icon{font-size:42px;line-height:1;filter:drop-shadow(0 0 12px var(--glow));position:relative;z-index:1}
+.hall strong{font-size:25px;font-weight:normal;text-shadow:0 3px 9px #000;position:relative;z-index:1}
+.hall small{font:13px system-ui;color:#f6e8d2;text-shadow:0 2px 7px #000;position:relative;z-index:1}
+.hall:nth-of-type(3n){border-radius:40% 40% 26% 26%}
+.hall:nth-of-type(3n):before{left:62px;right:62px;top:-84px;height:155px;border-radius:50% 50% 12% 12%}
+.hall:nth-of-type(3n+1):before{border-radius:70% 70% 10% 10%}
+#center{position:absolute;left:700px;top:500px;transform:translate(-50%,-50%);width:240px;height:240px;border-radius:50%;border:7px ridge #f9d99e;display:grid;place-items:center;text-align:center;background:radial-gradient(circle at 48% 24%,#fff6d3 0%,#d5a35d 12%,#27495d 32%,#091a30 73%);box-shadow:0 0 0 18px #c59b5866,0 0 0 40px #d3ae6740,0 25px 15px #000a,0 0 95px #eec681ab;font-size:28px}
+#center span{padding:10px;background:#081b2cb0;border-radius:18px;text-shadow:0 0 10px #ffd48b}
+header{position:fixed;z-index:5;top:0;left:0;right:0;text-align:center;padding:14px 66px 30px;background:linear-gradient(#04101eea,#04101eaa 72%,transparent);pointer-events:none}
+h1{font-size:clamp(19px,3.5vw,32px);font-weight:normal;letter-spacing:.08em;margin:0}header p{font:12px system-ui;color:#e0d5c6;margin:5px}
+#tools{position:fixed;z-index:6;right:12px;top:105px;display:grid;gap:8px}#tools button{width:49px;min-height:47px;font-size:21px}
+button{background:#10283eee;color:#f6ddb0;border:1px solid #d1aa72;border-radius:12px;padding:10px 12px;min-height:43px}
+#search{position:fixed;z-index:6;bottom:17px;left:12px;width:min(365px,calc(100vw - 86px));padding:14px;border-radius:13px;border:1px solid #c9a36c;background:#10253eea;color:white;font:14px system-ui}
+#label{position:fixed;z-index:7;top:7px;left:8px;font:10px system-ui;color:#f6dfb3;background:#0c2335e0;padding:6px;border-radius:8px}
+#overlay{position:fixed;z-index:10;inset:0;background:#020711c9;display:none;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(9px)}
+#room{width:min(680px,100%);max-height:94vh;overflow:auto;border:2px solid var(--rim,#d7b67b);border-radius:28px;position:relative;background:radial-gradient(ellipse at 50% 8%,var(--light,#dcb67766),transparent 55%),linear-gradient(160deg,var(--wall,#2b4356),#071626 80%);box-shadow:0 0 90px var(--glow,#cfa55d66),0 25px 90px #000b;padding:16px 22px 25px}
+#room .arch{height:190px;margin:4px auto 14px;width:min(350px,90%);border:7px ridge var(--rim);border-bottom:0;border-radius:50% 50% 0 0;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 70%,var(--light),transparent 70%),repeating-linear-gradient(90deg,#ffffff0d 0 15px,transparent 16px 39px);box-shadow:inset 0 0 55px #0008,0 0 32px var(--glow)}
+#room .arch span{font-size:90px;filter:drop-shadow(0 0 25px var(--glow))}
+#room h2{font-weight:normal;text-align:center;font-size:29px;margin:0 0 5px}
+#room p{text-align:center;color:#e4d9cb;font:14px system-ui;margin:5px 0 16px}
+#entries{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#entries button{background:#071e31bb;text-align:left;min-height:55px;box-shadow:inset 0 0 15px var(--glow);font:14px system-ui}
+#close{position:absolute;top:12px;right:12px;z-index:2}#message{font:12px system-ui;text-align:center;color:#d7c8b6;margin-top:12px;min-height:16px}
+@media(max-width:580px){header{padding-top:42px}header h1{font-size:19px}#tools{top:128px}#room .arch{height:140px}#room .arch span{font-size:70px}#entries{grid-template-columns:1fr}#room{padding:13px 15px 20px}#room h2{font-size:24px}}
+@media(prefers-reduced-motion:no-preference){.moon{animation:shine 7s ease-in-out infinite alternate}@keyframes shine{to{box-shadow:0 0 70px #ffedbbee,0 0 200px #edbd6eaa}}}
+
+/* V5: Корабль-Библиотека летит к большой звезде. Спокойный параллакс без тяжёлых видео. */
+#sky{background:radial-gradient(ellipse at 50% 17%,#304569 0%,#122743 31%,#07132a 62%,#020613 100%)}
+#sky:before{background:radial-gradient(ellipse at 50% 17%,#ffefb9b0 0%,#f3b65c55 5%,#d6a05918 19%,transparent 38%),radial-gradient(ellipse at 15% 52%,#4a6db27d,transparent 40%),radial-gradient(ellipse at 86% 67%,#703f9a60,transparent 43%)}
+.moon{left:calc(50% - 91px);top:8%;width:182px;height:182px;background:radial-gradient(circle at 40% 34%,#fffef0,#ffe6a6 48%,#d68f43 82%,#6d4829);box-shadow:0 0 65px #fff0c1cc,0 0 180px #e5aa6288,0 0 340px #e5aa623d;z-index:1}
+.moon:before{content:'';position:absolute;inset:-19px;border:2px solid #f9db9766;border-radius:50%;box-shadow:0 0 35px #f8e1ad66}
+.planet{position:absolute;width:clamp(120px,25vw,360px);aspect-ratio:1;right:-6%;top:27%;border-radius:50%;background:radial-gradient(ellipse at 25% 24%,#d6bb9a,#598b9c 28%,#355d79 51%,#1b304b 72%,#071226);box-shadow:inset -33px -24px 34px #030817bb,0 0 54px #86a4c44d;opacity:.85;transform:rotate(-19deg)}
+.planet:after{content:'';position:absolute;left:-32%;right:-32%;top:44%;height:21%;border:10px solid #b7c8d177;border-left-color:#b7c8d122;border-radius:50%;transform:rotate(-25deg)}
+.galaxy{position:absolute;left:-12%;top:20%;width:clamp(230px,42vw,650px);height:27%;border-radius:50%;transform:rotate(-30deg);background:radial-gradient(ellipse,#ffe2b48c 0%,#ba87c68a 13%,#6884bb66 31%,transparent 68%);filter:blur(9px);opacity:.68}
+.nebula{position:absolute;border-radius:50%;filter:blur(35px);opacity:.5;mix-blend-mode:screen}.nebula-a{left:-15%;top:52%;width:58%;height:45%;background:radial-gradient(ellipse,#407eaa88,transparent 70%)}.nebula-b{right:-18%;bottom:-10%;width:70%;height:58%;background:radial-gradient(ellipse,#9061ab7a,transparent 73%)}
+.starfield{position:absolute;inset:-30%;pointer-events:none;background-image:radial-gradient(#fff4db 1.6px,transparent 2.5px),radial-gradient(#b6e4ff 1px,transparent 2px);background-size:139px 169px,211px 197px;opacity:.65}.starfield-near{animation:spacefly 55s linear infinite}.starfield-far{opacity:.3;transform:scale(.75);animation:spacefly 100s linear infinite reverse}
+@keyframes spacefly{0%{translate:0 -4%}100%{translate:0 16%}}
+#mist{bottom:-34%;opacity:.5}
+.ship-halo{position:absolute;inset:35px 95px 10px;border-radius:50%;background:radial-gradient(ellipse,#ffdf9c15 30%,#93cbd01e 60%,transparent 76%);box-shadow:0 0 120px #e0bb7d42;pointer-events:none}
+#floor{border:12px ridge #e5bf83b0;box-shadow:0 0 0 20px #d9b36c1b,0 0 0 37px #f1d8a10d,0 25px 0 -3px #765d49,0 44px 0 -8px #263e55,0 63px 32px #0009,inset 0 0 100px #f1c2763b,0 0 130px #ddae6b66}
+.ship-keel{position:absolute;left:470px;top:780px;width:460px;height:215px;clip-path:polygon(0 0,100% 0,70% 100%,30% 100%);background:linear-gradient(180deg,#c5a8796b,#40556b99 45%,#0d233d00);filter:drop-shadow(0 30px 15px #0008);pointer-events:none}
+.ship-engine{position:absolute;top:840px;width:70px;height:210px;border-radius:50%;background:linear-gradient(180deg,#f7d8a088,#b9eaff55,transparent);filter:blur(20px);opacity:.55;pointer-events:none;animation:engine 5s ease-in-out infinite alternate}.engine-left{left:450px}.engine-right{right:450px;animation-delay:-2s}@keyframes engine{to{opacity:.24;transform:scaleY(1.17)}}
+.hall{transition:filter .25s,box-shadow .25s}.hall:active{filter:brightness(1.3)}
+#room{min-height:390px}#room .arch{height:205px;overflow:hidden;position:relative;border-radius:49% 49% 0 0;background:radial-gradient(ellipse at 50% 15%,#f9e7be77,transparent 60%),linear-gradient(#142b48,#091b2e)}
+#room .room-vista{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 38%,var(--light),transparent 55%);opacity:.9}
+#room .arch span{position:relative;z-index:2;text-shadow:0 0 28px #fff7d7}
+#room .room-floor{position:absolute;bottom:-50px;left:-20%;width:140%;height:110px;transform:perspective(200px) rotateX(53deg);background:repeating-linear-gradient(90deg,transparent 0 40px,#e8c38c55 41px 43px),repeating-linear-gradient(0deg,#d9b27c33 0 2px,transparent 3px 25px);box-shadow:0 0 55px var(--glow)}
+#room[data-realm='observatory'] .room-vista{background:radial-gradient(circle at 50% 40%,#ffebc9 0 3px,transparent 6px),repeating-radial-gradient(circle at 50% 40%,transparent 0 20px,#d9c58a77 22px 24px,transparent 26px 46px),radial-gradient(ellipse,#4b82ab,#091a31 70%)}
+#room[data-realm='garden'] .room-vista{background:radial-gradient(ellipse at 50% 80%,#a7ffbc99,transparent 55%),radial-gradient(circle at 28% 40%,#c9ffb088,transparent 18%),radial-gradient(circle at 73% 33%,#9dffe288,transparent 17%),linear-gradient(#0c3540,#102735)}
+#room[data-realm='sun'] .room-vista{background:radial-gradient(circle at 50% 44%,#fff5c3 0 12%,#ffc86d 18%,#c9772e88 35%,transparent 66%),linear-gradient(#7e4a30,#281b2b)}
+#room[data-realm='crystal'] .room-vista{background:conic-gradient(from 35deg at 50% 35%,#c4a5f655,#31426a,#e5baff66,#172b4c,#c4a5f655)}
+#room[data-realm='palace'] .room-vista{background:repeating-linear-gradient(90deg,#9dbbe133 0 7px,transparent 8px 45px),radial-gradient(ellipse,#9ebde677,#112843 75%)}
+#room[data-realm='cosmos'] .room-vista{background:radial-gradient(circle at 50% 40%,#f8ddaa 0 8px,transparent 25px),repeating-radial-gradient(ellipse at 50% 40%,transparent 0 23px,#b0e5d94d 25px 27px,transparent 29px 48px),radial-gradient(ellipse,#3a9b88,#091b31 72%)}
+@media(max-width:580px){.moon{top:12%;width:136px;height:136px;left:calc(50% - 68px)}#room .arch{height:160px}.planet{right:-15%;top:32%}}
+@media(prefers-reduced-motion:reduce){.starfield,.ship-engine,.moon{animation:none!important}}
+</style>
+<style>
+/* V6: трёхуровневая навигация, без изменения размера корабля */
+#sky .galaxy{left:3%;top:13%;width:43vw;max-width:520px;height:27%;opacity:.9;filter:blur(5px);background:radial-gradient(ellipse at 50% 50%,#fff3d8 0%,#edcaa5 3%,#a38acc 13%,#5072b8a8 27%,#304e9b55 42%,transparent 70%);box-shadow:0 0 70px #8d81d522;transform:rotate(-32deg)}
+#sky .galaxy:after{content:"";position:absolute;inset:20% 6%;border:14px solid #d6b7ff55;border-left-color:transparent;border-right-color:transparent;border-radius:50%;filter:blur(9px)}
+.starfield-near{animation:spacefly 27s linear infinite!important}.starfield-far{animation:spacefly 75s linear infinite reverse!important}
+#practice[hidden],#entries[hidden]{display:none!important}
+#practice{padding:2px 2px 12px;text-align:center}
+.practice-orbit{height:185px;position:relative;margin:0 auto 14px;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:radial-gradient(circle,#fff0b522,#75b3e41a 28%,transparent 68%)}
+.practice-light{font-size:73px;color:#fff2c8;text-shadow:0 0 18px #fff5d8,0 0 55px #e9b56e;z-index:1}
+.orbit{position:absolute;width:220px;height:95px;border:2px solid #e8c996aa;border-radius:50%;transform:rotate(-32deg);box-shadow:0 0 20px #dfb37d88}
+.orbit-b{transform:rotate(49deg);width:205px;height:90px;border-color:#9ad9f2aa}
+.practice-eyebrow{font:11px system-ui;letter-spacing:.18em;color:#f0d9a9}
+#practiceTitle{font-weight:normal;font-size:clamp(24px,6vw,36px);margin:12px 0;color:#fff0d0}
+#practiceText{font:15px/1.6 system-ui;color:#e0d8d0;max-width:430px;margin:0 auto 17px}
+#practiceBack{width:100%;font:15px system-ui;border-color:#f0c989;background:#14334b}
+.practice-cta{font:12px/1.5 system-ui;color:#d2c5b1;margin:16px 0 4px}
+#room.practice-mode .arch{height:90px;max-width:200px;margin-bottom:8px}
+#room.practice-mode .arch span{font-size:43px}
+#room.practice-mode #message{display:none}
+@media(prefers-reduced-motion:reduce){.starfield-near,.starfield-far{animation:none!important}}
+</style>
+
+<style>
+/* V7: каждый третий уровень — самостоятельная космическая сцена */
+#practiceScene{height:260px;max-width:540px;border:1px solid #bca3777a;border-radius:48% 48% 20px 20px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#d9b77c44,transparent 45%),linear-gradient(#07152a,#112d4c 70%,#071322);box-shadow:inset 0 0 55px #0009,0 0 40px #b2a0a033;isolation:isolate}
+#practiceScene .scene-stars{position:absolute;inset:0;background-image:radial-gradient(#ffefd3 1px,transparent 2px),radial-gradient(#bdd6ff 1px,transparent 2px);background-size:47px 57px,83px 69px;opacity:.7}
+#practiceScene .scene-horizon{position:absolute;bottom:0;width:100%;height:44%;background:linear-gradient(transparent,#3b779344);clip-path:polygon(0 70%,20% 30%,36% 62%,52% 12%,70% 65%,88% 35%,100% 70%,100% 100%,0 100%)}
+#practiceScene .practice-light{font-size:90px;line-height:1;filter:drop-shadow(0 0 18px #ffe9b2);z-index:2}
+#practiceScene .orbit{z-index:1}
+#practiceScene .scene-caption{position:absolute;bottom:13px;left:0;right:0;z-index:4;color:#f7e5c5;letter-spacing:.12em;font:12px system-ui;text-shadow:0 2px 6px #000}
+#practiceScene[data-kind="breath"]{background:radial-gradient(circle at 50% 48%,#a2ffdc88,transparent 43%),linear-gradient(#062c3a,#041522)}
+#practiceScene[data-kind="breath"] .practice-light{color:#b7fff1;animation:breathe 6s ease-in-out infinite}
+#practiceScene[data-kind="breath"] .orbit{border-color:#95fff0aa;animation:breathe 6s ease-in-out infinite}
+#practiceScene[data-kind="sleep"]{background:radial-gradient(ellipse at 50% 70%,#7b75c666,transparent 48%),linear-gradient(#04091f,#16294d)}
+#practiceScene[data-kind="sleep"] .practice-light{color:#f7e8c4;text-shadow:0 0 28px #e5d5fa}
+#practiceScene[data-kind="sleep"] .orbit{border-color:#8c9cd788}
+#practiceScene[data-kind="silence"]{background:radial-gradient(circle,#e6e5d144,transparent 42%),linear-gradient(#061b2e,#08121e)}
+#practiceScene[data-kind="silence"] .orbit{opacity:.2}
+#practiceScene[data-kind="anchor"]{background:radial-gradient(circle at 50% 56%,#ffc57eaa,transparent 38%),linear-gradient(#31243b,#09182a)}
+#practiceScene[data-kind="anchor"] .practice-light{color:#ffe3a5;font-size:104px}
+#practiceScene[data-kind="anchor"] .scene-horizon{height:30%;background:linear-gradient(transparent,#e8b96c66);clip-path:polygon(0 80%,100% 80%,100% 100%,0 100%)}
+#practiceScene[data-kind="focus"]{background:repeating-radial-gradient(circle at 50% 48%,#9cc9e21f 0 3px,transparent 5px 31px),linear-gradient(#08182c,#193e58)}
+#practiceScene[data-kind="focus"] .orbit{width:230px;height:230px;border:2px dotted #b5dffa99}
+#practiceScene[data-kind="energy"]{background:radial-gradient(circle at 50% 55%,#ffe09b88,transparent 54%),linear-gradient(#432e26,#091625)}
+#practiceScene[data-kind="energy"] .practice-light{color:#fff1c2;filter:drop-shadow(0 0 35px #ffd477)}
+#practiceScene[data-kind="galaxy"]{background:conic-gradient(from 35deg at 50% 50%,#121e4c,#6a4c88,#273a79,#0d253a,#121e4c)}
+#practiceScene[data-kind="galaxy"] .orbit{transform:rotate(-30deg) scale(1.2)}
+#practiceScene[data-kind="body"]{background:radial-gradient(ellipse at 50% 50%,#a2dfd977,transparent 55%),linear-gradient(#153e46,#061725)}
+#practiceScene[data-kind="portal"]{background:radial-gradient(circle,#bb9ee288,transparent 55%),linear-gradient(#241a42,#081425)}
+#room.practice-mode .arch{height:66px;max-width:140px}
+#room.practice-mode .arch span{font-size:30px}
+#room.practice-mode .arch .room-floor{opacity:.25}
+@keyframes breathe{0%,100%{transform:scale(.75);opacity:.68}50%{transform:scale(1.12);opacity:1}}
+@media(prefers-reduced-motion:reduce){#practiceScene .practice-light,#practiceScene .orbit{animation:none!important}}
+</style>
+<style>
+/* V8 — distinct movement for each selected practice, no external dependencies */
+#practiceScene{--duration:12s;--hue:0deg}
+#practiceScene .scene-comet{position:absolute;top:15%;left:-35%;width:70%;height:2px;transform:rotate(-17deg);background:linear-gradient(90deg,transparent,#d9e6ff88,#fff7d7);box-shadow:0 0 16px #fff2bd;opacity:0;z-index:2}
+#practiceScene .scene-beam{position:absolute;bottom:-35%;left:35%;width:30%;height:110%;background:linear-gradient(90deg,transparent,#f9d7a322,transparent);filter:blur(9px);opacity:.5;z-index:0}
+#practiceScene[data-motion="orbiting"] .orbit-a{animation:spin-a var(--duration) linear infinite}
+#practiceScene[data-motion="orbiting"] .orbit-b{animation:spin-b var(--duration) linear infinite reverse}
+#practiceScene[data-motion="ripple"] .orbit-a{animation:ripple var(--duration) ease-out infinite}
+#practiceScene[data-motion="ripple"] .orbit-b{animation:ripple var(--duration) ease-out infinite -4s}
+#practiceScene[data-motion="shimmer"] .practice-light{animation:shimmer var(--duration) ease-in-out infinite}
+#practiceScene[data-motion="shimmer"] .scene-beam{animation:beam var(--duration) ease-in-out infinite}
+#practiceScene[data-motion="drift"] .scene-stars{animation:drift var(--duration) linear infinite}
+#practiceScene[data-motion="drift"] .scene-comet{animation:comet var(--duration) linear infinite}
+#practiceScene[data-motion="rise"] .scene-beam{animation:beam var(--duration) ease-in-out infinite}
+#practiceScene[data-motion="rise"] .practice-light{animation:rise var(--duration) ease-in-out infinite}
+#practiceScene[data-motion="pulse"] .practice-light{animation:soft-pulse var(--duration) ease-in-out infinite}
+#practiceScene[data-motion="pulse"] .orbit-a{animation:soft-pulse var(--duration) ease-in-out infinite}
+#practiceScene[data-kind="breath"] .practice-light,#practiceScene[data-kind="breath"] .orbit{animation:breathe 6s ease-in-out infinite}
+#practiceScene[data-kind="sleep"] .scene-stars{animation:drift 35s linear infinite}
+#practiceScene[data-kind="focus"] .orbit-a{animation:spin-a 16s linear infinite}
+#practiceScene[data-kind="focus"] .orbit-b{animation:spin-b 19s linear infinite reverse}
+#practiceScene[data-kind="anchor"] .orbit-a{animation:spin-a 21s linear infinite}
+#practiceScene[data-kind="anchor"] .orbit-b{animation:spin-b 25s linear infinite reverse}
+#practiceScene.paused *,#practiceScene.paused *:before,#practiceScene.paused *:after{animation-play-state:paused!important;transition:none!important}
+#motionToggle{display:block;margin:0 auto 12px;min-height:40px;font:13px system-ui;border:1px solid #d9b67b8c;background:#0b2435;color:#ffe8c5}
+@keyframes spin-a{from{transform:rotate(-32deg)}to{transform:rotate(328deg)}}
+@keyframes spin-b{from{transform:rotate(49deg)}to{transform:rotate(409deg)}}
+@keyframes ripple{0%{transform:rotate(-25deg) scale(.45);opacity:0}35%{opacity:1}100%{transform:rotate(-25deg) scale(1.45);opacity:0}}
+@keyframes shimmer{0%,100%{opacity:.65;filter:drop-shadow(0 0 7px #ffdbab)}50%{opacity:1;filter:drop-shadow(0 0 40px #fff2b8)}}
+@keyframes drift{from{background-position:0 0,0 0}to{background-position:47px 114px,-83px 69px}}
+@keyframes comet{0%,40%{left:-40%;opacity:0}45%{opacity:.9}75%{left:110%;opacity:0}100%{opacity:0}}
+@keyframes beam{0%,100%{transform:translateY(30%);opacity:.15}50%{transform:translateY(-15%);opacity:.8}}
+@keyframes rise{0%,100%{transform:translateY(12px)}50%{transform:translateY(-18px)}}
+@keyframes soft-pulse{0%,100%{transform:scale(.88);opacity:.7}50%{transform:scale(1.13);opacity:1}}
+@media(prefers-reduced-motion:reduce){#practiceScene *,#practiceScene *:before,#practiceScene *:after{animation:none!important}}
+</style>
+<style>
+/* V9: атмосферная глубина, собственные частицы и последовательный просмотр практик */
+#practiceScene .scene-nebula{position:absolute;inset:-15%;z-index:0;background:radial-gradient(ellipse at 20% 25%,var(--particle-color,#9cdaff) 0%,transparent 28%),radial-gradient(ellipse at 82% 74%,var(--particle-accent,#e3ba80) 0%,transparent 29%);opacity:.16;filter:blur(28px);animation:nebula-wander 32s ease-in-out infinite alternate}
+#sceneParticles{position:absolute;inset:0;z-index:2;pointer-events:none}
+#sceneParticles i{position:absolute;left:var(--px);top:var(--py);width:var(--particle-size);height:var(--particle-size);border-radius:50%;background:var(--particle-color);box-shadow:0 0 10px 2px var(--particle-color);opacity:.55;animation:particle-drift 8s ease-in-out var(--delay) infinite alternate}
+#sceneParticles i:nth-child(3n){background:var(--particle-accent);box-shadow:0 0 9px var(--particle-accent)}
+#sceneParticles i:nth-child(4n){animation-duration:12s}
+#practiceScene[data-kind="breath"] #sceneParticles i{animation-duration:6s}
+#practiceScene[data-kind="sleep"] #sceneParticles i{animation-duration:22s}
+#practiceScene[data-kind="focus"] #sceneParticles i{animation-duration:14s}
+#practiceScene[data-kind="silence"] #sceneParticles i{animation-duration:18s;opacity:.24}
+#practiceScene[data-kind="energy"] #sceneParticles i{animation-name:particle-rise}
+#practiceScene[data-kind="anchor"] #sceneParticles i{animation-name:particle-shine}
+@keyframes nebula-wander{from{transform:translate(-3%,3%) rotate(-7deg)}to{transform:translate(4%,-4%) rotate(9deg)}}
+@keyframes particle-drift{from{transform:translate(0,0) scale(.7);opacity:.18}to{transform:translate(var(--drift),-18px) scale(1.4);opacity:.9}}
+@keyframes particle-rise{from{transform:translateY(25px) scale(.6);opacity:0}to{transform:translateY(-35px) scale(1.25);opacity:.9}}
+@keyframes particle-shine{from{transform:scale(.5);opacity:.2}to{transform:scale(1.6);opacity:.85}}
+#pathway{font:11px/1.5 system-ui;color:#d8c6aa;margin:8px auto 12px;overflow-wrap:anywhere;text-align:center}
+.practice-nav{display:grid;grid-template-columns:1fr 1.2fr;gap:9px;margin-top:14px}
+.practice-nav button{width:100%;font:13px/1.3 system-ui;min-height:50px}
+.practice-nav button:disabled{opacity:.45}
+#practiceScene.paused .scene-nebula,#practiceScene.paused #sceneParticles i{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){#practiceScene .scene-nebula,#sceneParticles i{animation:none!important}}
+@media(max-width:420px){.practice-nav{grid-template-columns:1fr}.practice-nav button{min-height:44px}}
+</style>
+
+<style id="anti-flicker-v10">
+/* V10: устраняем резкие сбросы циклов и изменение общей яркости */
+.starfield-near{animation:spacefly-safe 58s ease-in-out infinite alternate!important}
+.starfield-far{animation:spacefly-safe 110s ease-in-out infinite alternate-reverse!important}
+@keyframes spacefly-safe{from{transform:translate3d(0,-1.5%,0)}to{transform:translate3d(0,1.5%,0)}}
+#practiceScene[data-motion="drift"] .scene-stars,
+#practiceScene[data-kind="sleep"] .scene-stars{animation:stars-seamless 45s linear infinite!important}
+@keyframes stars-seamless{from{background-position:0 0,0 0}to{background-position:47px 57px,83px 69px}}
+#practiceScene[data-motion="shimmer"] .practice-light{animation:shimmer-safe var(--duration) ease-in-out infinite!important}
+@keyframes shimmer-safe{0%,100%{opacity:.9;transform:scale(1);filter:drop-shadow(0 0 15px #ffdbab)}50%{opacity:1;transform:scale(1.035);filter:drop-shadow(0 0 19px #ffdbab)}}
+#practiceScene[data-motion="ripple"] .orbit-a,
+#practiceScene[data-motion="ripple"] .orbit-b{animation-name:ripple-safe!important}
+@keyframes ripple-safe{0%,100%{transform:rotate(-25deg) scale(.84);opacity:.42}50%{transform:rotate(-25deg) scale(1.1);opacity:.78}}
+#practiceScene[data-motion="pulse"] .practice-light,
+#practiceScene[data-motion="pulse"] .orbit-a{animation-name:soft-pulse-safe!important}
+@keyframes soft-pulse-safe{0%,100%{transform:scale(.94);opacity:.86}50%{transform:scale(1.055);opacity:1}}
+#practiceScene[data-kind="breath"] .practice-light,
+#practiceScene[data-kind="breath"] .orbit{animation:breathe-safe 7s ease-in-out infinite!important}
+@keyframes breathe-safe{0%,100%{transform:scale(.89);opacity:.86}50%{transform:scale(1.07);opacity:1}}
+#practiceScene[data-motion="rise"] .scene-beam,
+#practiceScene[data-motion="shimmer"] .scene-beam{animation:beam-safe var(--duration) ease-in-out infinite!important}
+@keyframes beam-safe{0%,100%{transform:translateY(8%);opacity:.28}50%{transform:translateY(-8%);opacity:.42}}
+#practiceScene .scene-comet{animation:none!important;opacity:0!important}
+#practiceScene .scene-nebula{opacity:.12;animation:nebula-safe 40s ease-in-out infinite alternate!important}
+@keyframes nebula-safe{from{transform:translate(-2%,2%)}to{transform:translate(2%,-2%)}}
+#practiceScene .scene-horizon{animation:none!important}
+#practiceScene.paused *,#practiceScene.paused *:before,#practiceScene.paused *:after{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.starfield-near,.starfield-far,#practiceScene *,#practiceScene *:before,#practiceScene *:after{animation:none!important}}
+</style>
+
+<style id="v11-polish">
+/* Первый уровень: локальные пролёты, без изменения общей яркости неба */
+#shootingStars{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+.shooting-star{position:absolute;width:clamp(45px,10vw,125px);height:2px;border-radius:99px;background:linear-gradient(90deg,transparent,#c2eaff88 35%,#fff6d7);filter:drop-shadow(0 0 5px #bde9ff);opacity:0;transform:rotate(var(--angle));animation:star-cross 2.8s ease-in-out 1 both}
+.shooting-star:after{content:"";position:absolute;right:0;top:-2px;width:6px;height:6px;border-radius:50%;background:#fff8e6}
+.shooting-star.meteor{height:3px;width:clamp(65px,13vw,155px);background:linear-gradient(90deg,transparent,#ffbb7977,#ffebc4);filter:drop-shadow(0 0 7px #ffc57c)}
+.shooting-star.meteor:after{width:9px;height:9px;top:-3px;box-shadow:0 0 9px #ffcc8d}
+@keyframes star-cross{0%{opacity:0;translate:0 0}18%{opacity:.8}70%{opacity:.75}100%{opacity:0;translate:var(--travel) 75px}}
+#depthPanel{padding:10px 5px 20px;text-align:center}
+#depthPanel[hidden]{display:none!important}
+.depth-label{font:11px system-ui;letter-spacing:.16em;color:#ebd2a2;margin-bottom:12px}
+#depthTitle{font:normal clamp(23px,5vw,32px)/1.25 Georgia,serif;color:#ffebc7;margin:0 0 12px}
+#depthIntro{font:14px/1.5 system-ui;color:#ddd0bc;max-width:430px;margin:0 auto 18px}
+#depthEntries{display:grid;gap:10px}
+#depthEntries button,.depth-back{min-height:49px;width:100%;border-radius:12px;border:1px solid #e7c78b77;background:#122f4a;color:#fff0d2;font:15px/1.3 system-ui;padding:12px;cursor:pointer}
+.depth-back{margin-top:15px;background:#1c2c40}
+#practiceScene .orbit-a{width:var(--ring-width);height:var(--ring-height);rotate:var(--tilt)}
+#practiceScene .orbit-b{width:calc(var(--ring-width) * .87);height:calc(var(--ring-height) * 1.12);rotate:calc(var(--tilt) * -1)}
+#practiceScene .scene-nebula{background:radial-gradient(ellipse at var(--nebula-x) var(--nebula-y),var(--particle-color),transparent 33%),radial-gradient(ellipse at 80% 74%,var(--particle-accent),transparent 30%)}
+/* 12 схем движения: индивидуальная геометрия, направление, скорость и частицы у каждой записи */
+#practiceScene[data-variant="0"] .orbit-a{animation:variant-rock var(--scene-speed) ease-in-out infinite alternate!important}
+#practiceScene[data-variant="1"] .orbit-b{animation:variant-spin var(--scene-speed) ease-in-out infinite alternate!important}
+#practiceScene[data-variant="2"] .practice-light{animation:variant-rise var(--scene-speed) ease-in-out infinite alternate!important}
+#practiceScene[data-variant="3"] .orbit-a{animation:variant-expand var(--scene-speed) ease-in-out infinite alternate!important}
+#practiceScene[data-variant="4"] .orbit-b{animation:variant-rock var(--scene-speed) ease-in-out infinite alternate-reverse!important}
+#practiceScene[data-variant="5"] .practice-light{animation:variant-turn var(--scene-speed) ease-in-out infinite alternate!important}
+#practiceScene[data-variant="6"] .orbit-a{animation:variant-spin var(--scene-speed) ease-in-out infinite alternate-reverse!important}
+#practiceScene[data-variant="7"] .scene-beam{animation:variant-rise var(--scene-speed) ease-in-out infinite alternate!important}
+#practiceScene[data-variant="8"] .orbit-b{animation:variant-expand var(--scene-speed) ease-in-out infinite alternate-reverse!important}
+#practiceScene[data-variant="9"] .practice-light{animation:variant-rock var(--scene-speed) ease-in-out infinite alternate!important}
+#practiceScene[data-variant="10"] .orbit-a{animation:variant-turn var(--scene-speed) ease-in-out infinite alternate!important}
+#practiceScene[data-variant="11"] .orbit-b{animation:variant-rise var(--scene-speed) ease-in-out infinite alternate!important}
+@keyframes variant-rock{from{transform:rotate(-8deg) scale(.98)}to{transform:rotate(8deg) scale(1.02)}}
+@keyframes variant-spin{from{transform:rotate(-18deg)}to{transform:rotate(18deg)}}
+@keyframes variant-rise{from{transform:translateY(7px)}to{transform:translateY(-7px)}}
+@keyframes variant-expand{from{transform:scale(.93)}to{transform:scale(1.07)}}
+@keyframes variant-turn{from{transform:rotate(-7deg) translateX(-5px)}to{transform:rotate(7deg) translateX(5px)}}
+#practiceScene[data-variant="0"] #sceneParticles i,#practiceScene[data-variant="4"] #sceneParticles i,#practiceScene[data-variant="8"] #sceneParticles i{animation-name:particle-shine}
+#practiceScene[data-variant="1"] #sceneParticles i,#practiceScene[data-variant="5"] #sceneParticles i,#practiceScene[data-variant="9"] #sceneParticles i{animation-name:particle-rise}
+@media(prefers-reduced-motion:reduce){.shooting-star,#practiceScene *{animation:none!important}}
+</style>
+
+<style id="v12-targeted-fixes">
+/* Фоновые звёзды постоянно движутся в одном направлении. Цикл замкнут по размерам фоновой плитки, без скачка. */
+#sky .starfield-near,#sky .starfield-far{
+ animation:none!important;translate:none!important;transform:none!important;
+ will-change:background-position;
+}
+#sky .starfield-near{animation:starfield-flow-near 18s linear infinite!important}
+#sky .starfield-far{opacity:.4;animation:starfield-flow-far 38s linear infinite!important}
+@keyframes starfield-flow-near{
+ from{background-position:0 0,0 0}
+ to{background-position:139px 169px,211px 197px}
+}
+@keyframes starfield-flow-far{
+ from{background-position:0 0,0 0}
+ to{background-position:-139px 169px,-211px 197px}
+}
+/* Внимание: никаких вспышек и изменения яркости — только мягкое движение колец */
+#practiceScene[data-kind="focus"] .practice-light{
+ animation:none!important;opacity:1!important;filter:none!important;
+}
+#practiceScene[data-kind="focus"] .orbit-a{
+ animation:focus-gentle-a 24s ease-in-out infinite alternate!important;opacity:.74!important;
+}
+#practiceScene[data-kind="focus"] .orbit-b{
+ animation:focus-gentle-b 31s ease-in-out infinite alternate!important;opacity:.62!important;
+}
+#practiceScene[data-kind="focus"] #sceneParticles i{
+ animation:focus-float 17s ease-in-out infinite alternate!important;opacity:.58!important;
+}
+#practiceScene[data-kind="focus"] .scene-nebula{
+ animation:nebula-safe 45s ease-in-out infinite alternate!important;opacity:.1!important;
+}
+@keyframes focus-gentle-a{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+@keyframes focus-gentle-b{from{transform:rotate(10deg)}to{transform:rotate(-10deg)}}
+@keyframes focus-float{from{transform:translateY(-4px)}to{transform:translateY(4px)}}
+@media(prefers-reduced-motion:reduce){
+ #sky .starfield-near,#sky .starfield-far{animation:none!important}
+}
+</style>
+
+<style id="v13-practice-motion-only">
+/* Утверждённый первый уровень v12 не изменён. Исправлены только сцены практик. */
+#practiceScene .scene-motion-arc,#practiceScene .scene-motion-dots{display:none;position:absolute;inset:0;pointer-events:none;z-index:2}
+#practiceScene[data-kind="focus"] .scene-motion-arc,
+#practiceScene[data-kind="focus"] .scene-motion-dots,
+#practiceScene[data-kind="energy"] .scene-motion-arc,
+#practiceScene[data-kind="energy"] .scene-motion-dots{display:block}
+/* Обсерватория: два отчётливо движущихся спутника на орбитах, без пульсации яркости */
+#practiceScene[data-kind="focus"] .scene-motion-arc{
+ inset:14% 16% 16%;border:2px solid #9fdcf199;border-radius:50%;
+ box-shadow:0 0 15px #8bdfff33,inset 0 0 15px #8bdfff22;
+ animation:focus-orbit-visible 12s linear infinite!important;
+}
+#practiceScene[data-kind="focus"] .scene-motion-arc:before{
+ content:"";position:absolute;left:50%;top:-7px;width:14px;height:14px;border-radius:50%;
+ background:#fff2c8;box-shadow:0 0 13px 4px #a7eaff;
+}
+#practiceScene[data-kind="focus"] .scene-motion-dots{
+ inset:25% 28% 27%;border:2px dashed #e7d2a9a8;border-radius:50%;
+ animation:focus-orbit-visible 18s linear infinite reverse!important;
+}
+#practiceScene[data-kind="focus"] .scene-motion-dots:before{
+ content:"";position:absolute;right:0;top:50%;width:9px;height:9px;border-radius:50%;
+ background:#9ee7ff;box-shadow:0 0 13px 3px #9ee7ff;
+}
+@keyframes focus-orbit-visible{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+/* Ресурс: заметные потоки золотого света движутся вверх, но общий фон не меняется */
+#practiceScene[data-kind="energy"] .scene-motion-arc{
+ inset:9% 13%;background:repeating-linear-gradient(90deg,transparent 0 12%,#ffd99544 13%,transparent 17%,transparent 29%);
+ mask-image:linear-gradient(transparent,#000 30% 70%,transparent);
+ animation:resource-stream 7s ease-in-out infinite alternate!important;
+}
+#practiceScene[data-kind="energy"] .scene-motion-dots{
+ inset:13% 12%;
+ background:
+ radial-gradient(circle at 18% 82%,#ffe8ac 0 4px,transparent 5px),
+ radial-gradient(circle at 78% 65%,#fff1bf 0 5px,transparent 6px),
+ radial-gradient(circle at 38% 30%,#f7cb79 0 3px,transparent 4px),
+ radial-gradient(circle at 66% 24%,#ffe9ae 0 4px,transparent 5px);
+ filter:drop-shadow(0 0 9px #f5c06e);
+ animation:resource-particles 9s ease-in-out infinite alternate!important;
+}
+@keyframes resource-stream{from{transform:translateY(23px)}to{transform:translateY(-23px)}}
+@keyframes resource-particles{from{transform:translateY(18px) rotate(-6deg)}to{transform:translateY(-18px) rotate(6deg)}}
+/* Стабильная светимость для обеих сцен */
+#practiceScene[data-kind="focus"] .practice-light,
+#practiceScene[data-kind="energy"] .practice-light{
+ animation:none!important;opacity:1!important;
+}
+#practiceScene[data-kind="energy"] .orbit-a{animation:resource-orbit 14s ease-in-out infinite alternate!important}
+#practiceScene[data-kind="energy"] .orbit-b{animation:resource-orbit 19s ease-in-out infinite alternate-reverse!important}
+@keyframes resource-orbit{from{transform:rotate(-16deg) scale(.96)}to{transform:rotate(16deg) scale(1.04)}}
+#practiceScene.paused .scene-motion-arc,#practiceScene.paused .scene-motion-dots{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){
+ #practiceScene .scene-motion-arc,#practiceScene .scene-motion-dots{animation:none!important}
+}
+</style>
+</head><body>
+<div id="sky"><div class="nebula nebula-a"></div><div class="nebula nebula-b"></div><div class="galaxy"></div><div class="planet"></div><div class="moon"></div><div class="starfield starfield-near"></div><div class="starfield starfield-far"></div><div id="mist"></div><div id="shootingStars" aria-hidden="true"></div></div>
+<div id="viewport"><div id="world"><div class="ship-halo"></div><div class="ship-engine engine-left"></div><div class="ship-engine engine-right"></div><div id="floor"></div><div class="ship-keel"></div><svg id="roads" viewBox="0 0 1400 1020"><g id="lines"></g></svg><div id="center"><span>МОЯ<br>КОМНАТА</span></div></div></div>
+<div id="label">ОТДЕЛЬНЫЙ ПРОТОТИП · САЙТ НЕ ИЗМЕНЁН</div>
+<header><h1>БИБЛИОТЕКА СОСТОЯНИЙ</h1><p>Не информация. Состояние. · Выберите зал</p></header>
+<div id="tools"><button onclick="zoom(1.3)" aria-label="Приблизить">+</button><button onclick="zoom(1/1.3)" aria-label="Отдалить">−</button><button onclick="fit()" aria-label="Вся карта">⌂</button></div>
+<input id="search" placeholder="Найти комнату или практику…" aria-label="Поиск">
+<div id="overlay"><section id="room"><button id="close" onclick="closeRoom()">Закрыть ×</button><div class="arch"><div class="room-vista"></div><span id="roomIcon"></span><div class="room-floor"></div></div><h2 id="roomTitle"></h2><p id="roomSubtitle"></p><div id="entries"></div><div id="depthPanel" hidden><div class="depth-label" id="depthLabel"></div><h3 id="depthTitle"></h3><p id="depthIntro"></p><div id="depthEntries"></div><button class="depth-back" onclick="goDepthBack()">← Назад</button></div><div id="practice" hidden><div class="practice-orbit" id="practiceScene"><div class="scene-stars"></div><div class="scene-nebula"></div><div class="scene-particles" id="sceneParticles"></div><div class="scene-comet"></div><div class="scene-beam"></div><div class="scene-motion-arc"></div><div class="scene-motion-dots"></div><div class="scene-horizon"></div><div class="practice-light" id="practiceSymbol">✧</div><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="scene-caption" id="sceneCaption"></div></div><button id="motionToggle" onclick="toggleMotion()" aria-pressed="false">Остановить анимацию</button><div class="practice-eyebrow" id="practiceLevel">УРОВЕНЬ 3 · ПРОСТРАНСТВО ПРАКТИКИ</div><div id="pathway">Библиотека / Зал / Практика</div><h3 id="practiceTitle"></h3><p id="practiceText"></p><div class="practice-nav"><button id="practiceBack" onclick="backToHall()">← В зал</button><button id="practiceNext" onclick="nextPractice()">Следующая практика →</button></div><div class="practice-cta">Это художественный прототип. Запуск реальной практики будет подключён только после утверждения.</div></div><div id="message">Прототип: реальные переходы пока не подключены.</div></section></div>
+<script>
+const halls=[["Аудиопрактики", "8 опубликованных записей", ["Точка опоры", "Спокойствие", "Спокойствие перед сном", "Концентрация внимания", "Ресурс", "Уверенность", "Остров глубокого сна", "Ясность"], 240, 210, "◉"], ["Живые комнаты", "6 комнат · 30 упражнений", ["Комната дыхания", "Комната тишины", "Комната внимания", "Комната тела", "Комната отпускания", "Комната присутствия"], 950, 215, "✧"], ["Ежедневные практики", "Практики и мысли дня", ["Практика дня", "Мысль дня", "200 практик", "200 мыслей"], 220, 655, "☼"], ["Комнаты состояний", "Выбор состояния", ["Сон и сновидения", "Внутреннее спокойствие", "Уверенность и опора", "Внимание и ясность", "Подбор по состоянию"], 480, 730, "✦"], ["Другие пространства", "Общение и исследование", ["Гостиная · чат и видеоэфиры", "Клуб", "Встречи", "Дневник", "Комната игр · в разработке", "Короткий Путь · в разработке"], 980, 660, "⌂"], ["Живое поле", "3 интерактивных исследования", ["Мой мир", "Мир людей", "Как изменить мир"], 710, 150, "∞"]];
+const themes=[
+{wall:'#345a77',rim:'#f3d39b',light:'#9cd6ff77',glow:'#6fcaff88',icon:'◉'},
+{wall:'#356b70',rim:'#a6e4df',light:'#a9ffe788',glow:'#73e9c688',icon:'✧'},
+{wall:'#75523d',rim:'#ffdc9d',light:'#ffdc8c99',glow:'#ffba6588',icon:'☼'},
+{wall:'#5c487c',rim:'#e6c8ff',light:'#c9a6ff88',glow:'#ae87ff88',icon:'✦'},
+{wall:'#3b5575',rim:'#d9c69c',light:'#a8c6ff88',glow:'#9ebfff88',icon:'⌂'},
+{wall:'#285e5b',rim:'#f2d79c',light:'#80f4c088',glow:'#7de5b788',icon:'∞'}];
+const world=document.getElementById('world'),viewport=document.getElementById('viewport'),lines=document.getElementById('lines');
+let scale=.5,x=0,y=0,dragged=false,currentHall=null,currentPractice=null,depthStack=[],currentItems=[];const points=new Map();let pinch=null;
+function apply(){world.style.transform=`translate(${x}px,${y}px) scale(${scale})`}
+function fit(){scale=Math.min((innerWidth-35)/1400,(innerHeight-85)/1020);x=(innerWidth-1400*scale)/2;y=(innerHeight-1020*scale)/2;apply()}
+function zoom(f){let ns=Math.max(.22,Math.min(2.5,scale*f));x=innerWidth/2-(innerWidth/2-x)*ns/scale;y=innerHeight/2-(innerHeight/2-y)*ns/scale;scale=ns;apply()}
+halls.forEach((h,i)=>{let t=themes[i],px=h[3]/1200*1150+125,py=h[4]/900*850+85;
+let el=document.createElement('div');el.className='hall';el.style.left=px+'px';el.style.top=py+'px';for(let k of ['wall','rim','light','glow'])el.style.setProperty('--'+k,t[k]);el.innerHTML=`<div class="icon">${t.icon}</div><strong>${h[0]}</strong><small>${h[1]}</small>`;el.addEventListener('click',()=>{if(!dragged)openRoom(i)});world.append(el);
+let d=`M700 500 Q${(700+px)/2+65} ${(500+py)/2-55} ${px} ${py}`;lines.insertAdjacentHTML('beforeend',`<path d="${d}"/><path class="lane" d="${d}"/>`)});
+function openRoom(i){currentHall=i;document.getElementById('entries').hidden=false;document.getElementById('practice').hidden=true;document.getElementById('depthPanel').hidden=true;depthStack=[];currentItems=halls[i][2];const h=halls[i],t=themes[i],room=document.getElementById('room');for(let k of ['wall','rim','light','glow'])room.style.setProperty('--'+k,t[k]);room.dataset.realm=['observatory','garden','sun','crystal','palace','cosmos'][i];document.getElementById('roomIcon').textContent=t.icon;document.getElementById('roomTitle').textContent=h[0];document.getElementById('roomSubtitle').textContent=h[1];document.getElementById('message').textContent='Прототип: реальные переходы пока не подключены.';const list=document.getElementById('entries');list.innerHTML='';h[2].forEach(item=>{let b=document.createElement('button');b.textContent=item;b.onclick=()=>selectItem(item);list.append(b)});document.getElementById('overlay').style.display='flex'}
+const liveRooms=['Комната дыхания','Комната тишины','Комната внимания','Комната тела','Комната отпускания','Комната присутствия'];
+const groups={
+ 'Комната игр · в разработке':['НЕ Я','ПУТЬ','СВЕТ · в разработке'],
+ 'Короткий Путь · в разработке':['Демонстрационная практика','Обучение «Короткий Путь»'],
+ '200 практик':['Каталог 200 практик'],
+ '200 мыслей':['Каталог 200 мыслей'],
+ 'Сон и сновидения':['Остров глубокого сна','Спокойствие перед сном'],
+ 'Внутреннее спокойствие':['Спокойствие','Точка опоры'],
+ 'Уверенность и опора':['Уверенность','Точка опоры'],
+ 'Внимание и ясность':['Концентрация внимания','Ясность'],
+ 'Гостиная · чат и видеоэфиры':['Чат','Видеоэфиры']
+};
+liveRooms.forEach(n=>groups[n]=['Упражнение 1','Упражнение 2','Упражнение 3','Упражнение 4','Упражнение 5']);
+const deepestGroups={
+ 'НЕ Я':['Открыть игру «НЕ Я»'],
+ 'ПУТЬ':['Открыть игру «ПУТЬ»'],
+ 'СВЕТ · в разработке':['Игра «СВЕТ» · в разработке'],
+ 'Обучение «Короткий Путь»':['Программа обучения','Занятия · в разработке']
+};
+const specialLocked=new Set(['Открыть игру «НЕ Я»','Открыть игру «ПУТЬ»','Игра «СВЕТ» · в разработке','Демонстрационная практика','Обучение «Короткий Путь»']);
+function selectItem(item){
+ // В «Живом поле» карточка исследования сразу открывает финальную сцену.
+ if(currentHall===5){openPractice(item);return}
+ const children=groups[item]||deepestGroups[item];
+ if(children){openDepth(item,children);return}
+ openPractice(item);
+}
+function openDepth(title,items){
+ const room=document.getElementById('room');
+ room.classList.remove('practice-mode');
+ depthStack.push({title,items});currentItems=items;
+ document.getElementById('entries').hidden=true;
+ document.getElementById('practice').hidden=true;
+ document.getElementById('depthPanel').hidden=false;
+ document.getElementById('roomTitle').textContent=halls[currentHall][0];
+ document.getElementById('roomSubtitle').textContent=halls[currentHall][1];
+ const level=2+depthStack.length;
+ document.getElementById('depthLabel').textContent='УРОВЕНЬ '+level+' · '+halls[currentHall][0];
+ document.getElementById('depthTitle').textContent=title;
+ document.getElementById('depthIntro').textContent=liveRooms.includes(title)?'Пять упражнений этой комнаты. Названия условные — их нужно сверить с действующим сайтом.':title.includes('разработке')?'Раздел показан в прототипе. Доступ к играм и обучению не изменён.':'Выберите пространство для продолжения.';
+ const entries=document.getElementById('depthEntries');entries.replaceChildren();
+ items.forEach(item=>{const b=document.createElement('button');b.textContent=item;b.onclick=()=>selectItem(item);entries.append(b)});
+ room.scrollTop=0;
+}
+function goDepthBack(){
+ depthStack.pop();
+ if(depthStack.length){const previous=depthStack.pop();openDepth(previous.title,previous.items)}
+ else openRoom(currentHall);
+}
+function openPractice(item){
+ currentPractice=item;
+ document.getElementById('entries').hidden=true;
+ document.getElementById('depthPanel').hidden=true;
+ document.getElementById('practice').hidden=false;
+ document.getElementById('roomTitle').textContent='';
+ document.getElementById('roomSubtitle').textContent='';
+ document.getElementById('room').classList.add('practice-mode');
+ const scene=document.getElementById('practiceScene');
+ const name=item.toLowerCase();
+ const kind=name.includes('дыхани')?'breath':name.includes('сн')?'sleep':name.includes('тишин')||name.includes('спокойств')?'silence':name.includes('опор')||name.includes('уверен')?'anchor':name.includes('внимани')||name.includes('концентрац')||name.includes('ясност')?'focus':name.includes('энерги')||name.includes('ресурс')?'energy':name.includes('поле')||name.includes('мир')?'galaxy':name.includes('тела')||name.includes('присутств')?'body':'portal';
+ scene.dataset.kind=kind;
+ const identity=[halls[currentHall][0],...depthStack.map(d=>d.title),item].join(' / ');
+ const seed=Array.from(identity).reduce((n,c)=>((n*31+c.charCodeAt(0))>>>0),7);
+ const variant=seed%12;
+ scene.dataset.variant=String(variant);
+ scene.style.setProperty('--tilt',(12+(seed%63))+'deg');
+ scene.style.setProperty('--ring-width',(160+(seed%92))+'px');
+ scene.style.setProperty('--ring-height',(60+(seed%55))+'px');
+ scene.style.setProperty('--nebula-x',(16+(seed%70))+'%');
+ scene.style.setProperty('--nebula-y',(18+((seed>>>5)%62))+'%');
+ scene.style.setProperty('--particle-turn',((seed%2?1:-1)*(25+(seed%85)))+'deg');
+ scene.style.setProperty('--scene-speed',(7+(seed%19))+'s');
+ const palettes=[['#8ed9f1','#e6b871'],['#d5b4ff','#94d5f5'],['#f7d59b','#f5a97d'],['#91e7d1','#c7e9ff'],['#c4d4ff','#f3d3a4'],['#ffc7dc','#a7ccff']];
+ const palette=palettes[seed%palettes.length];
+ scene.style.setProperty('--particle-color',palette[0]);
+ scene.style.setProperty('--particle-accent',palette[1]);
+ const particles=document.getElementById('sceneParticles');particles.replaceChildren();
+ for(let i=0;i<16;i++){let dot=document.createElement('i');dot.style.setProperty('--px',((seed+i*53)%93+3)+'%');dot.style.setProperty('--py',((seed*3+i*37)%79+8)+'%');dot.style.setProperty('--delay',(-i*.71)+'s');dot.style.setProperty('--drift',((i%2?1:-1)*(12+i%7*4))+'px');dot.style.setProperty('--particle-size',(2+(seed+i)%5)+'px');particles.append(dot)}
+ document.getElementById('pathway').textContent=['Библиотека',halls[currentHall][0],...depthStack.map(d=>d.title),item].join(' / ');
+ document.getElementById('practiceLevel').textContent='УРОВЕНЬ '+(3+depthStack.length)+' · ПРОСТРАНСТВО';
+ 
+ const next=currentItems;document.getElementById('practiceNext').disabled=next.length<2;
+ scene.dataset.motion=['orbiting','ripple','shimmer','drift','rise','pulse'][seed%6];
+ scene.style.setProperty('--duration',(8+seed%9)+'s');
+ scene.style.setProperty('--hue',(seed%110-55)+'deg');
+ scene.classList.remove('paused');
+ document.getElementById('motionToggle').textContent='Остановить анимацию';
+ document.getElementById('motionToggle').setAttribute('aria-pressed','false');
+ const symbols={breath:'◌',sleep:'☾',silence:'✧',anchor:'◆',focus:'◎',energy:'☼',galaxy:'∞',body:'◈',portal:'✦'};
+ const captions={breath:'Пульсирующий свет',sleep:'Звёздная ночь',silence:'Пространство тишины',anchor:'Световая опора',focus:'Обсерватория внимания',energy:'Источник света',galaxy:'Бесконечность',body:'Присутствие',portal:'Портал практики'};
+ document.getElementById('practiceSymbol').textContent=symbols[kind];
+ document.getElementById('sceneCaption').textContent=captions[kind];
+ document.getElementById('practiceTitle').textContent=item;
+ document.getElementById('practiceText').textContent=item.includes('в разработке')?'Это пространство в разработке.':specialLocked.has(item)?'Демонстрация оформления. Реальный доступ к этому разделу не открывается.':'Космический образ этого пространства. Реальный переход пока не подключён.';
+ document.getElementById('message').textContent='';
+ document.getElementById('room').scrollTop=0;
+}
+function nextPractice(){const items=currentItems,i=items.indexOf(currentPractice);selectItem(items[(i+1)%items.length])}
+function toggleMotion(){
+ const el=document.getElementById('practiceScene'),btn=document.getElementById('motionToggle');
+ const paused=el.classList.toggle('paused');
+ btn.textContent=paused?'Включить анимацию':'Остановить анимацию';
+ btn.setAttribute('aria-pressed',String(paused));
+}
+function backToHall(){document.getElementById('room').classList.remove('practice-mode');if(depthStack.length){const prev=depthStack.pop();openDepth(prev.title,prev.items)}else openRoom(currentHall)}
+function closeRoom(){document.getElementById('overlay').style.display='none';document.getElementById('room').classList.remove('practice-mode')}
+document.getElementById('search').addEventListener('input',e=>{let q=e.target.value.trim().toLocaleLowerCase('ru');if(!q)return;let i=halls.findIndex(h=>h[0].toLocaleLowerCase('ru').includes(q)||h[2].some(s=>s.toLocaleLowerCase('ru').includes(q)));if(i>=0)openRoom(i)});
+viewport.addEventListener('pointerdown',e=>{points.set(e.pointerId,{x:e.clientX,y:e.clientY});if(points.size===1)dragged=false;viewport.setPointerCapture(e.pointerId);if(points.size===2){let p=[...points.values()];pinch={distance:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),scale,x,y,mx:(p[0].x+p[1].x)/2,my:(p[0].y+p[1].y)/2};dragged=true}});
+viewport.addEventListener('pointermove',e=>{if(!points.has(e.pointerId))return;let p=points.get(e.pointerId);points.set(e.pointerId,{x:e.clientX,y:e.clientY});if(points.size===1){let dx=e.clientX-p.x,dy=e.clientY-p.y;if(Math.abs(dx)+Math.abs(dy)>2){dragged=true;x+=dx;y+=dy;apply()}}else if(points.size===2&&pinch){let a=[...points.values()],mx=(a[0].x+a[1].x)/2,my=(a[0].y+a[1].y)/2;scale=Math.max(.22,Math.min(2.5,pinch.scale*Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)/Math.max(1,pinch.distance)));x=mx-(pinch.mx-pinch.x)*scale/pinch.scale;y=my-(pinch.my-pinch.y)*scale/pinch.scale;dragged=true;apply()}});
+viewport.addEventListener('pointerup',e=>{points.delete(e.pointerId);if(points.size<2)pinch=null});viewport.addEventListener('pointercancel',e=>{points.delete(e.pointerId);pinch=null});
+viewport.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.13:.89)},{passive:false});window.addEventListener('resize',fit);fit();
+const shootingLayer=document.getElementById('shootingStars');
+let shootingTimer;
+function shootStar(){
+ if(document.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches){shootingTimer=setTimeout(shootStar,11000);return}
+ const star=document.createElement('span');
+ star.className='shooting-star'+(Math.random()<.23?' meteor':'');
+ star.style.left=(5+Math.random()*75)+'%';
+ star.style.top=(7+Math.random()*53)+'%';
+ star.style.setProperty('--travel',(130+Math.random()*170)+'px');
+ star.style.setProperty('--angle',(15+Math.random()*25)+'deg');
+ star.addEventListener('animationend',()=>star.remove(),{once:true});
+ shootingLayer.append(star);
+ shootingTimer=setTimeout(shootStar,6500+Math.random()*9000);
+}
+shootingTimer=setTimeout(shootStar,2400);
+
+
+// Bridge for trusted Next.js wrapper. Keep visual markup and level-one animations unchanged.
+const COSMIC_ROUTES = {"Точка опоры": "/dashboard/catalog/tochka-opory", "Спокойствие": "/dashboard/catalog/spokoistvie", "Спокойствие перед сном": "/dashboard/catalog/son", "Концентрация внимания": "/dashboard/catalog/vnimanie", "Ресурс": "/dashboard/catalog/resurs", "Уверенность": "/dashboard/catalog/uverennost", "Остров глубокого сна": "/dashboard/catalog/ostrov-sna", "Ясность": "/dashboard/catalog/yasnost", "Комната дыхания": "/dashboard/live-rooms/dyhanie", "Комната тишины": "/dashboard/live-rooms/tishina", "Комната внимания": "/dashboard/live-rooms/vnimanie", "Комната тела": "/dashboard/live-rooms/telo", "Комната отпускания": "/dashboard/live-rooms/otpusk", "Комната присутствия": "/dashboard/live-rooms/prisutstvie", "Практика дня": "/dashboard", "Мысль дня": "/dashboard", "200 практик": "/dashboard", "200 мыслей": "/dashboard", "Сон и сновидения": "/dashboard/states/son", "Внутреннее спокойствие": "/dashboard/states/spokoystvie", "Уверенность и опора": "/dashboard/states/uverennost", "Внимание и ясность": "/dashboard/states/vnimanie", "Подбор по состоянию": "/dashboard/catalog", "Гостиная · чат и видеоэфиры": "/dashboard/lounge", "Чат": "/dashboard/lounge", "Видеоэфиры": "/dashboard/lounge", "Клуб": "/dashboard/club", "Встречи": "/dashboard/lounge/club/meetings", "Дневник": "/dashboard/diary", "Мой мир": "/zhivoe-pole", "Мир людей": "/zhivoe-pole", "Как изменить мир": "/zhivoe-pole", "Каталог 200 практик": "/dashboard", "Каталог 200 мыслей": "/dashboard"};
+const cosmicRouteButton = document.createElement('button');
+cosmicRouteButton.type='button';
+cosmicRouteButton.textContent='Открыть действующее пространство →';
+cosmicRouteButton.style.cssText='display:none;margin:12px auto;padding:12px 18px;min-height:46px;background:#a58352;color:#fff9ec;border:1px solid #e6c68e;border-radius:12px;cursor:pointer';
+document.getElementById('practice').append(cosmicRouteButton);
+function syncCosmicRoute(item){
+ const direct=COSMIC_ROUTES[item];
+ // Never route placeholders, games, or training. Live room exercises route to their real room, not an invented exercise URL.
+ const parentRoom=depthStack.length?depthStack[depthStack.length-1].title:null;
+ const route=direct || (parentRoom && /^Упражнение [1-5]$/.test(item) ? COSMIC_ROUTES[parentRoom] : null);
+ cosmicRouteButton.style.display=route?'block':'none';
+ cosmicRouteButton.onclick=route?()=>window.parent.postMessage({type:'cosmic-map:navigate',path:route},location.origin):null;
+}
+const originalCosmicOpenPractice=openPractice;
+openPractice=function(item){originalCosmicOpenPractice(item);syncCosmicRoute(item)};
+
+</script></body></html>
