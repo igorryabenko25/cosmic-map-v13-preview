@@ -365,7 +365,7 @@ button{background:#10283eee;color:#f6ddb0;border:1px solid #d1aa72;border-radius
 <header><h1>БИБЛИОТЕКА СОСТОЯНИЙ</h1><p>Не информация. Состояние. · Выберите зал</p></header>
 <div id="tools"><button onclick="zoom(1.3)" aria-label="Приблизить">+</button><button onclick="zoom(1/1.3)" aria-label="Отдалить">−</button><button onclick="fit()" aria-label="Вся карта">⌂</button></div>
 <input id="search" placeholder="Найти комнату или практику…" aria-label="Поиск">
-<div id="overlay"><section id="room"><button id="close" onclick="closeRoom()">Закрыть ×</button><div class="arch"><div class="room-vista"></div><span id="roomIcon"></span><div class="room-floor"></div></div><h2 id="roomTitle"></h2><p id="roomSubtitle"></p><div id="entries"></div><div id="depthPanel" hidden><div class="depth-label" id="depthLabel"></div><h3 id="depthTitle"></h3><p id="depthIntro"></p><div id="depthEntries"></div><button class="depth-back" onclick="goDepthBack()">← Назад</button></div><div id="practice" hidden><div class="practice-orbit" id="practiceScene"><div class="scene-stars"></div><div class="scene-nebula"></div><div class="scene-particles" id="sceneParticles"></div><div class="scene-comet"></div><div class="scene-beam"></div><div class="scene-motion-arc"></div><div class="scene-motion-dots"></div><div class="scene-horizon"></div><div class="practice-light" id="practiceSymbol">✧</div><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="scene-caption" id="sceneCaption"></div></div><button id="motionToggle" onclick="toggleMotion()" aria-pressed="false">Остановить анимацию</button><div class="practice-eyebrow" id="practiceLevel">УРОВЕНЬ 3 · ПРОСТРАНСТВО ПРАКТИКИ</div><div id="pathway">Библиотека / Зал / Практика</div><h3 id="practiceTitle"></h3><p id="practiceText"></p><div class="practice-nav"><button id="practiceBack" onclick="backToHall()">← В зал</button><button id="practiceNext" onclick="nextPractice()">Следующая практика →</button></div><div class="practice-cta">Это художественный прототип. Запуск реальной практики будет подключён только после утверждения.</div></div><div id="message">Прототип: реальные переходы пока не подключены.</div></section></div>
+<div id="overlay"><section id="room"><button id="close" onclick="closeRoom()">Закрыть ×</button><div class="arch"><div class="room-vista"></div><span id="roomIcon"></span><div class="room-floor"></div></div><h2 id="roomTitle"></h2><p id="roomSubtitle"></p><div id="entries"></div><div id="depthPanel" hidden><div class="depth-label" id="depthLabel"></div><h3 id="depthTitle"></h3><p id="depthIntro"></p><div id="depthEntries"></div><button class="depth-back" onclick="goDepthBack()">← Назад</button></div><div id="practice" hidden><div class="practice-orbit" id="practiceScene"><div class="scene-stars"></div><div class="scene-nebula"></div><div class="scene-particles" id="sceneParticles"></div><div class="scene-comet"></div><div class="scene-beam"></div><div class="scene-motion-arc"></div><div class="scene-motion-dots"></div><div class="scene-horizon"></div><div class="practice-light" id="practiceSymbol">✧</div><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="scene-caption" id="sceneCaption"></div></div><button id="motionToggle" onclick="toggleMotion()" aria-pressed="false">Остановить анимацию</button><div class="practice-eyebrow" id="practiceLevel">УРОВЕНЬ 3 · ПРОСТРАНСТВО ПРАКТИКИ</div><div id="pathway">Библиотека / Зал / Практика</div><h3 id="practiceTitle"></h3><p id="practiceText"></p><div class="practice-nav"><button id="practiceBack" onclick="backToHall()">← В зал</button><button id="practiceNext" onclick="nextPractice()">Следующая практика →</button></div><div class="practice-cta"></div></div><div id="message"></div></section></div>
 <script>
 const halls=[["Аудиопрактики", "8 опубликованных записей", ["Точка опоры", "Спокойствие", "Спокойствие перед сном", "Концентрация внимания", "Ресурс", "Уверенность", "Остров глубокого сна", "Ясность"], 240, 210, "◉"], ["Живые комнаты", "6 комнат · 30 упражнений", ["Комната дыхания", "Комната тишины", "Комната внимания", "Комната тела", "Комната отпускания", "Комната присутствия"], 950, 215, "✧"], ["Ежедневные практики", "Практики и мысли дня", ["Практика дня", "Мысль дня", "200 практик", "200 мыслей"], 220, 655, "☼"], ["Комнаты состояний", "Выбор состояния", ["Сон и сновидения", "Внутреннее спокойствие", "Уверенность и опора", "Внимание и ясность", "Подбор по состоянию"], 480, 730, "✦"], ["Другие пространства", "Общение и исследование", ["Гостиная · чат и видеоэфиры", "Клуб", "Встречи", "Дневник", "Комната игр · в разработке", "Короткий Путь · в разработке"], 980, 660, "⌂"], ["Живое поле", "3 интерактивных исследования", ["Мой мир", "Мир людей", "Как изменить мир"], 710, 150, "∞"]];
 const themes=[
@@ -383,7 +383,7 @@ function zoom(f){let ns=Math.max(.22,Math.min(2.5,scale*f));x=innerWidth/2-(inne
 halls.forEach((h,i)=>{let t=themes[i],px=h[3]/1200*1150+125,py=h[4]/900*850+85;
 let el=document.createElement('div');el.className='hall';el.style.left=px+'px';el.style.top=py+'px';for(let k of ['wall','rim','light','glow'])el.style.setProperty('--'+k,t[k]);el.innerHTML=`<div class="icon">${t.icon}</div><strong>${h[0]}</strong><small>${h[1]}</small>`;el.addEventListener('click',()=>{if(!dragged)openRoom(i)});world.append(el);
 let d=`M700 500 Q${(700+px)/2+65} ${(500+py)/2-55} ${px} ${py}`;lines.insertAdjacentHTML('beforeend',`<path d="${d}"/><path class="lane" d="${d}"/>`)});
-function openRoom(i){currentHall=i;document.getElementById('entries').hidden=false;document.getElementById('practice').hidden=true;document.getElementById('depthPanel').hidden=true;depthStack=[];currentItems=halls[i][2];const h=halls[i],t=themes[i],room=document.getElementById('room');for(let k of ['wall','rim','light','glow'])room.style.setProperty('--'+k,t[k]);room.dataset.realm=['observatory','garden','sun','crystal','palace','cosmos'][i];document.getElementById('roomIcon').textContent=t.icon;document.getElementById('roomTitle').textContent=h[0];document.getElementById('roomSubtitle').textContent=h[1];document.getElementById('message').textContent='Прототип: реальные переходы пока не подключены.';const list=document.getElementById('entries');list.innerHTML='';h[2].forEach(item=>{let b=document.createElement('button');b.textContent=item;b.onclick=()=>selectItem(item);list.append(b)});document.getElementById('overlay').style.display='flex'}
+function openRoom(i){currentHall=i;document.getElementById('entries').hidden=false;document.getElementById('practice').hidden=true;document.getElementById('depthPanel').hidden=true;depthStack=[];currentItems=halls[i][2];const h=halls[i],t=themes[i],room=document.getElementById('room');for(let k of ['wall','rim','light','glow'])room.style.setProperty('--'+k,t[k]);room.dataset.realm=['observatory','garden','sun','crystal','palace','cosmos'][i];document.getElementById('roomIcon').textContent=t.icon;document.getElementById('roomTitle').textContent=h[0];document.getElementById('roomSubtitle').textContent=h[1];document.getElementById('message').textContent='';const list=document.getElementById('entries');list.innerHTML='';h[2].forEach(item=>{let b=document.createElement('button');b.textContent=item;b.onclick=()=>selectItem(item);list.append(b)});document.getElementById('overlay').style.display='flex'}
 const liveRooms=['Комната дыхания','Комната тишины','Комната внимания','Комната тела','Комната отпускания','Комната присутствия'];
 const groups={
  'Комната игр · в разработке':['НЕ Я','ПУТЬ','СВЕТ · в разработке'],
@@ -396,7 +396,51 @@ const groups={
  'Внимание и ясность':['Концентрация внимания','Ясность'],
  'Гостиная · чат и видеоэфиры':['Чат','Видеоэфиры']
 };
-liveRooms.forEach(n=>groups[n]=['Упражнение 1','Упражнение 2','Упражнение 3','Упражнение 4','Упражнение 5']);
+const verifiedLivePractices={
+ "Комната дыхания": [
+  "Длинный выдох",
+  "Ровное дыхание",
+  "Перед сном",
+  "Просто наблюдать",
+  "Дыхание и всё тело"
+ ],
+ "Комната тишины": [
+  "Ничего не делать",
+  "Один звук",
+  "Между звуками",
+  "С открытыми глазами",
+  "Телефон рядом"
+ ],
+ "Комната внимания": [
+  "Широкий взгляд",
+  "Один звук — все звуки",
+  "Ладонь и экран",
+  "Без выбора",
+  "Периферия"
+ ],
+ "Комната тела": [
+  "Ладони",
+  "Ноги",
+  "Точки опоры",
+  "Всё тело сразу",
+  "Движение изнутри"
+ ],
+ "Комната отпускания": [
+  "Мысль → тело",
+  "Не продолжать историю",
+  "Оставить вопрос открытым",
+  "Дать ощущению место",
+  "Написать и закрыть"
+ ],
+ "Комната присутствия": [
+  "Увидеть вокруг",
+  "Три расстояния звука",
+  "Несколько шагов",
+  "Прикосновение",
+  "Посмотреть в окно"
+ ]
+};
+liveRooms.forEach(n=>groups[n]=verifiedLivePractices[n] || []);
 const deepestGroups={
  'НЕ Я':['Открыть игру «НЕ Я»'],
  'ПУТЬ':['Открыть игру «ПУТЬ»'],
@@ -421,9 +465,9 @@ function openDepth(title,items){
  document.getElementById('roomTitle').textContent=halls[currentHall][0];
  document.getElementById('roomSubtitle').textContent=halls[currentHall][1];
  const level=2+depthStack.length;
- document.getElementById('depthLabel').textContent='УРОВЕНЬ '+level+' · '+halls[currentHall][0];
+ document.getElementById('depthLabel').textContent=halls[currentHall][0];
  document.getElementById('depthTitle').textContent=title;
- document.getElementById('depthIntro').textContent=liveRooms.includes(title)?'Пять упражнений этой комнаты. Названия условные — их нужно сверить с действующим сайтом.':title.includes('разработке')?'Раздел показан в прототипе. Доступ к играм и обучению не изменён.':'Выберите пространство для продолжения.';
+ document.getElementById('depthIntro').textContent=liveRooms.includes(title)?'Выберите практику.':title.includes('разработке')?'Доступ к разделу определяется правилами Библиотеки.':'Выберите пространство для продолжения.';
  const entries=document.getElementById('depthEntries');entries.replaceChildren();
  items.forEach(item=>{const b=document.createElement('button');b.textContent=item;b.onclick=()=>selectItem(item);entries.append(b)});
  room.scrollTop=0;
@@ -463,7 +507,7 @@ function openPractice(item){
  const particles=document.getElementById('sceneParticles');particles.replaceChildren();
  for(let i=0;i<16;i++){let dot=document.createElement('i');dot.style.setProperty('--px',((seed+i*53)%93+3)+'%');dot.style.setProperty('--py',((seed*3+i*37)%79+8)+'%');dot.style.setProperty('--delay',(-i*.71)+'s');dot.style.setProperty('--drift',((i%2?1:-1)*(12+i%7*4))+'px');dot.style.setProperty('--particle-size',(2+(seed+i)%5)+'px');particles.append(dot)}
  document.getElementById('pathway').textContent=['Библиотека',halls[currentHall][0],...depthStack.map(d=>d.title),item].join(' / ');
- document.getElementById('practiceLevel').textContent='УРОВЕНЬ '+(3+depthStack.length)+' · ПРОСТРАНСТВО';
+ document.getElementById('practiceLevel').textContent=halls[currentHall][0];
  
  const next=currentItems;document.getElementById('practiceNext').disabled=next.length<2;
  scene.dataset.motion=['orbiting','ripple','shimmer','drift','rise','pulse'][seed%6];
@@ -477,7 +521,7 @@ function openPractice(item){
  document.getElementById('practiceSymbol').textContent=symbols[kind];
  document.getElementById('sceneCaption').textContent=captions[kind];
  document.getElementById('practiceTitle').textContent=item;
- document.getElementById('practiceText').textContent=item.includes('в разработке')?'Это пространство в разработке.':specialLocked.has(item)?'Демонстрация оформления. Реальный доступ к этому разделу не открывается.':'Космический образ этого пространства. Реальный переход пока не подключён.';
+ document.getElementById('practiceText').textContent=item.includes('в разработке')?'Это пространство в разработке.':specialLocked.has(item)?'Доступ к разделу определяется правилами Библиотеки.':'Выберите действие, чтобы продолжить.';
  document.getElementById('message').textContent='';
  document.getElementById('room').scrollTop=0;
 }
@@ -523,7 +567,7 @@ function syncCosmicRoute(item){
  const direct=COSMIC_ROUTES[item];
  // Never route placeholders, games, or training. Live room exercises route to their real room, not an invented exercise URL.
  const parentRoom=depthStack.length?depthStack[depthStack.length-1].title:null;
- const route=direct || (parentRoom && /^Упражнение [1-5]$/.test(item) ? COSMIC_ROUTES[parentRoom] : null);
+ const route=direct || (parentRoom && verifiedLivePractices[parentRoom]?.includes(item) ? COSMIC_ROUTES[parentRoom] : null);
  cosmicRouteButton.style.display=route?'block':'none';
  cosmicRouteButton.onclick=route?()=>window.parent.postMessage({type:'cosmic-map:navigate',path:route},location.origin):null;
 }
