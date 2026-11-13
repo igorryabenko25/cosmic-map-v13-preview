@@ -363,8 +363,8 @@ button{background:#10283eee;color:#f6ddb0;border:1px solid #d1aa72;border-radius
 #room{scroll-padding-top:72px}
 #room.practice-mode #practice>button:last-of-type{max-width:100%}
 #room.practice-mode #practice #motionToggle{max-width:100%}
-#room.practice-mode #practiceText + button{position:sticky;bottom:10px;z-index:20;width:min(100%,520px);max-width:100%;box-shadow:0 5px 22px #000a;font:clamp(14px,4vw,19px)/1.25 Georgia,serif;min-height:54px}
-@media(max-width:580px){#overlay{padding:12px 8px max(12px,env(safe-area-inset-bottom))}#room{max-height:calc(100dvh - 32px);padding:12px 14px 24px}#room #close{top:8px;margin-bottom:-48px;font-size:17px;padding:10px 14px}#room.practice-mode #practiceText + button{bottom:8px;margin:10px auto 12px}}
+#room.practice-mode #practiceText + a{position:sticky;bottom:10px;z-index:20;width:min(100%,520px);max-width:100%;box-shadow:0 5px 22px #000a;font:clamp(14px,4vw,19px)/1.25 Georgia,serif;min-height:54px}
+@media(max-width:580px){#overlay{padding:12px 8px max(12px,env(safe-area-inset-bottom))}#room{max-height:calc(100dvh - 32px);padding:12px 14px 24px}#room #close{top:8px;margin-bottom:-48px;font-size:17px;padding:10px 14px}#room.practice-mode #practiceText + a{bottom:8px;margin:10px auto 12px}}
 </style>
 </head><body>
 <div id="sky"><div class="nebula nebula-a"></div><div class="nebula nebula-b"></div><div class="galaxy"></div><div class="planet"></div><div class="moon"></div><div class="starfield starfield-near"></div><div class="starfield starfield-far"></div><div id="mist"></div><div id="shootingStars" aria-hidden="true"></div></div>
@@ -566,10 +566,11 @@ shootingTimer=setTimeout(shootStar,2400);
 
 // Bridge for trusted Next.js wrapper. Keep visual markup and level-one animations unchanged.
 const COSMIC_ROUTES = {"Точка опоры": "/dashboard/catalog/tochka-opory", "Спокойствие": "/dashboard/catalog/spokoistvie", "Спокойствие перед сном": "/dashboard/catalog/son", "Концентрация внимания": "/dashboard/catalog/vnimanie", "Ресурс": "/dashboard/catalog/resurs", "Уверенность": "/dashboard/catalog/uverennost", "Остров глубокого сна": "/dashboard/catalog/ostrov-sna", "Ясность": "/dashboard/catalog/yasnost", "Комната дыхания": "/dashboard/live-rooms/dyhanie", "Комната тишины": "/dashboard/live-rooms/tishina", "Комната внимания": "/dashboard/live-rooms/vnimanie", "Комната тела": "/dashboard/live-rooms/telo", "Комната отпускания": "/dashboard/live-rooms/otpusk", "Комната присутствия": "/dashboard/live-rooms/prisutstvie", "Практика дня": "/dashboard", "Мысль дня": "/dashboard", "200 практик": "/dashboard", "200 мыслей": "/dashboard", "Сон и сновидения": "/dashboard/states/son", "Внутреннее спокойствие": "/dashboard/states/spokoystvie", "Уверенность и опора": "/dashboard/states/uverennost", "Внимание и ясность": "/dashboard/states/vnimanie", "Подбор по состоянию": "/dashboard/catalog", "Гостиная · чат и видеоэфиры": "/dashboard/lounge", "Чат": "/dashboard/lounge", "Видеоэфиры": "/dashboard/lounge", "Клуб": "/dashboard/club", "Встречи": "/dashboard/lounge/club/meetings", "Дневник": "/dashboard/diary", "Мой мир": "/zhivoe-pole", "Мир людей": "/zhivoe-pole", "Как изменить мир": "/zhivoe-pole", "Каталог 200 практик": "/dashboard", "Каталог 200 мыслей": "/dashboard"};
-const cosmicRouteButton = document.createElement('button');
-cosmicRouteButton.type='button';
+const cosmicRouteButton = document.createElement('a');
+cosmicRouteButton.target='_blank';
+cosmicRouteButton.rel='noopener noreferrer';
 cosmicRouteButton.textContent='Открыть действующее пространство →';
-cosmicRouteButton.style.cssText='display:none;margin:12px auto;padding:12px 18px;min-height:46px;background:#a58352;color:#fff9ec;border:1px solid #e6c68e;border-radius:12px;cursor:pointer';
+cosmicRouteButton.style.cssText='display:none;margin:12px auto;padding:12px 18px;min-height:46px;background:#a58352;color:#fff9ec;border:1px solid #e6c68e;border-radius:12px;cursor:pointer;text-decoration:none;text-align:center;align-items:center;justify-content:center;box-sizing:border-box';
 document.getElementById('practiceText').insertAdjacentElement('afterend',cosmicRouteButton);
 function syncCosmicRoute(item){
  const direct=COSMIC_ROUTES[item];
@@ -577,7 +578,7 @@ function syncCosmicRoute(item){
  const parentRoom=depthStack.length?depthStack[depthStack.length-1].title:null;
  const route=direct || (parentRoom && verifiedLivePractices[parentRoom]?.includes(item) ? COSMIC_ROUTES[parentRoom] : null);
  cosmicRouteButton.style.display=route?'block':'none';
- cosmicRouteButton.onclick=route?()=>{const destination=new URL(route,'https://biblioteka-sostoyaniy.ru');if(window.parent!==window){let sameOrigin=false;try{sameOrigin=window.parent.location.origin===window.location.origin}catch(e){}if(sameOrigin){window.parent.postMessage({type:'cosmic-map:navigate',path:route},window.location.origin);return}}window.location.assign(destination.href)}:null;
+ if(route){cosmicRouteButton.href=new URL(route,'https://biblioteka-sostoyaniy.ru').href;cosmicRouteButton.style.display='flex'}else{cosmicRouteButton.removeAttribute('href');cosmicRouteButton.style.display='none'}
 }
 const originalCosmicOpenPractice=openPractice;
 openPractice=function(item){originalCosmicOpenPractice(item);syncCosmicRoute(item)};
